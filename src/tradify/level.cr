@@ -6,11 +6,12 @@ module Tradify
 
     def initialize(@game : Game)
       @loaded = false
-      @screen = Screen.new
+      @screen = Screen.new(@game)
     end
 
     def load
       @screen = Screen.new(
+        game: @game,
         x: 0,
         y: 0,
         width: Game::SCREEN_WIDTH,
