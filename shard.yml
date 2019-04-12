@@ -1,0 +1,13 @@
+name: tradify
+version: 0.1.0
+
+authors:
+  - Matt Swieboda <matts@topsteptrader.com>
+
+targets:
+  tradify:
+    main: src/tradify.cr
+
+crystal: 0.27.2
+
+license: MIT
