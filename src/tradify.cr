@@ -1,6 +1,10 @@
-# TODO: Write documentation for `Tradify`
-module Tradify
-  VERSION = "0.1.0"
+require "cray"
+require "./tradify/*"
 
-  # TODO: Put your code here
+module Tradify
+  def self.run
+    Game.new.run
+  end
 end
+
+Tradify.run
