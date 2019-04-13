@@ -8,7 +8,7 @@ module Tradify
 
     @chart : Chart
 
-    def initialize(@game : Game, @x : Int32, @y : Int32, @width : Int32, @height : Int32)
+    def initialize(@game : Game, @x : Int32, @y : Int32, @width : Int32, @height : Int32, price_data : Array(Int32) = [] of Int32)
       @buttons = [] of Button
 
       action_width = 150
@@ -32,7 +32,8 @@ module Tradify
         x: MARGIN + BORDER + PADDING,
         y: MARGIN + BORDER + PADDING,
         width: @width - MARGIN * 2 - BORDER * 2 - PADDING * 2 - action_width,
-        height: @height - MARGIN * 2 - BORDER * 2 - PADDING * 2
+        height: @height - MARGIN * 2 - BORDER * 2 - PADDING * 2,
+        price_data: price_data
       )
     end
 

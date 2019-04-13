@@ -4,6 +4,8 @@ module Tradify
 
     @screen : Screen
 
+    PRICE_DATA = [50, 70, 90, 40, 60, 30, 80, 100, 130, 150, 130, 110, 100, 90, 110, 130, 120, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
+
     def initialize(@game : Game)
       @loaded = false
       @screen = Screen.new(@game)
@@ -15,7 +17,8 @@ module Tradify
         x: 0,
         y: 0,
         width: Game::SCREEN_WIDTH,
-        height: Game::SCREEN_HEIGHT
+        height: Game::SCREEN_HEIGHT,
+        price_data: PRICE_DATA
       )
     end
 

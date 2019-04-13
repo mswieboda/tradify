@@ -11,11 +11,9 @@ module Tradify
     LINE_THICKNESS_RATIO = 2.0
     POINT_SIZE           = LINE_THICKNESS * 1.5
 
-    POINTS = [50, 70, 90, 40, 60, 30, 80, 100, 130, 150, 130, 110, 100, 90, 110, 130, 120, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
-
     DATA_INTERVAL = 0.25
 
-    def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32, @price_data : Array(Int32) = POINTS)
+    def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32, @price_data : Array(Int32) = [] of Int32)
       @timer = Timer.new(DATA_INTERVAL)
       @price_index = 0
       @prices = [] of Int32
@@ -31,11 +29,13 @@ module Tradify
 
       @timer.increase(delta_t)
 
-      # @view_x =
+      @view_x = @price_index * GRID_SIZE / 2 - @width
+      @view_x = 0 if @view_x < 0
+      @view_y = 0
+
       if @timer.done? && @price_data.any?
-        @prices << @price_data[@price_index]
+        @prices << @price_data[@price_index % @price_data.size]
         @price_index += 1
-        @price_index = 0 if @price_index >= @price_data.size
         @timer.restart
       end
     end
@@ -94,28 +94,30 @@ module Tradify
         px = @x + price_x * GRID_SIZE / 2
         py = @y + @height / 2 + price
 
-        # points
-        if Game::DEBUG
-          LibRay.draw_rectangle_v(
-            position: LibRay::Vector2.new(x: px - POINT_SIZE / 2, y: py - POINT_SIZE / 2),
-            size: LibRay::Vector2.new(x: POINT_SIZE, y: POINT_SIZE),
-            color: PLOT_COLOR
-          )
-        end
+        unless px < @x + @view_x || px > @x + @view_x + @width
+          # points
+          if Game::DEBUG
+            LibRay.draw_rectangle_v(
+              position: LibRay::Vector2.new(x: px - @view_x - POINT_SIZE / 2, y: py - POINT_SIZE / 2),
+              size: LibRay::Vector2.new(x: POINT_SIZE, y: POINT_SIZE),
+              color: PLOT_COLOR
+            )
+          end
 
-        # lines
-        if price_x > 0
-          LINE_THICKNESS.times do |thickness|
-            LibRay.draw_line_v(
-              start_pos: LibRay::Vector2.new(x: last_px, y: last_py + thickness / LINE_THICKNESS_RATIO),
-              end_pos: LibRay::Vector2.new(x: px, y: py + thickness / LINE_THICKNESS_RATIO),
-              color: PLOT_COLOR
-            )
-            LibRay.draw_line_v(
-              start_pos: LibRay::Vector2.new(x: last_px, y: last_py - thickness / LINE_THICKNESS_RATIO),
-              end_pos: LibRay::Vector2.new(x: px, y: py - thickness / LINE_THICKNESS_RATIO),
-              color: PLOT_COLOR
-            )
+          # lines
+          if price_x > 0
+            LINE_THICKNESS.times do |thickness|
+              LibRay.draw_line_v(
+                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py + thickness / LINE_THICKNESS_RATIO),
+                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py + thickness / LINE_THICKNESS_RATIO),
+                color: PLOT_COLOR
+              )
+              LibRay.draw_line_v(
+                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py - thickness / LINE_THICKNESS_RATIO),
+                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py - thickness / LINE_THICKNESS_RATIO),
+                color: PLOT_COLOR
+              )
+            end
           end
         end
 
