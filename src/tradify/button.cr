@@ -42,6 +42,10 @@ module Tradify
       @color = DEFAULT_COLOR
     end
 
+    def enabled?
+      !disabled?
+    end
+
     def update
       return if disabled?
 

@@ -26,7 +26,6 @@ module Tradify
 
     def start
       # ran once the level is loaded, and first update and draw ran
-      @game.show(TypedMessage.new(["Welcome to Tradify.", "Try to make money by buying and selling!"])) unless Game::DEBUG
     end
 
     def draw

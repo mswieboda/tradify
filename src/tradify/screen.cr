@@ -123,6 +123,12 @@ module Tradify
     end
 
     def update
+      if @account.balance < @chart.price
+        @buttons[0].disable
+      else
+        @buttons[0].enable
+      end
+
       update_account_info
 
       @chart.update

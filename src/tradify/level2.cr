@@ -1,8 +1,8 @@
 module Tradify
-  class Level1 < Level
+  class Level2 < Level
     INITIAL_BALANCE = 1000
     TARGET_PROFIT   =  100
-    PRICE_DATA      = [70, 50, 70, 90, 40, 20, 15, 30, 10, 20, 30, 40, 45, 30, 50, 70, 60, 80, 100, 130, 150, 190, 140, 130, 110, 100, 90, 110, 130, 120, 150, 140, 160, 100, 90, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
+    PRICE_DATA      = [300, 330, 350, 200, 220, 590, 680, 720, 200, 190, 200, 200, 200, 190, 130, 110, 110, 115, 115, 105, 100, 105, 100, 100, 135, 140, 140, 130, 120, 150, 155, 160, 180, 200, 220, 200]
 
     def load
       @account = Account.new(balance: INITIAL_BALANCE)
@@ -15,7 +15,7 @@ module Tradify
 
     def start
       # ran once the level is loaded, and first update and draw ran
-      @game.show(TypedMessage.new(["Welcome to Tradify.", "Try to make money by buying and selling!"])) unless Game::DEBUG
+      @game.show(TypedMessage.new("Try to make money by buying and selling, with a different chart!")) unless Game::DEBUG
     end
 
     def target_reached?

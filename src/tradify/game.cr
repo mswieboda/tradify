@@ -3,6 +3,7 @@ module Tradify
     getter? game_over
     getter? paused
 
+    @levels : Array(Level)
     @level : Level | Nil
     @message : Message
 
@@ -43,7 +44,15 @@ module Tradify
 
       @message = Message.new
 
-      level = Level1.new(self)
+      # levels
+      @levels = [] of Level
+      @level_index = 0
+
+      [Level2, Level1].each do |level_class|
+        @levels << level_class.new(self).as(Level)
+      end
+
+      level = @levels[@level_index]
       level.load
       @level = level
     end
@@ -61,7 +70,18 @@ module Tradify
     end
 
     def check_game_over?
-      !paused? && false
+      !paused? && @level_index >= @levels.size
+    end
+
+    def change_level
+      @level_index += 1
+
+      return if @level_index >= @levels.size
+
+      new_level = @levels[@level_index]
+      new_level.load
+
+      @level = new_level
     end
 
     def show(message : Message)
@@ -86,6 +106,8 @@ module Tradify
       @message.update
 
       unpause if @message.just_closed?
+
+      change_level if level.completed?
 
       if check_game_over?
         @game_over_timer.increase(LibRay.get_frame_time)
