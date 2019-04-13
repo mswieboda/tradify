@@ -9,7 +9,8 @@ module Tradify
       @screen = Screen.new(
         game: @game,
         account: @account,
-        price_data: PRICE_DATA
+        price_data: PRICE_DATA,
+        level: self
       )
     end
 

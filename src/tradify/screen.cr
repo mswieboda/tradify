@@ -12,7 +12,7 @@ module Tradify
     @account_info_color : LibRay::Color
     @price_color : LibRay::Color
 
-    def initialize(@game, @account : Account, price_data : Array(Int32))
+    def initialize(@game, @account : Account, price_data : Array(Int32), @level : Level)
       x = 0
       y = 0
       width = Game::SCREEN_WIDTH
@@ -45,17 +45,22 @@ module Tradify
         x: @account_info_position.x.to_i,
         y: @account_info_position.y.to_i + @account_info_measure.y.to_i + PADDING,
         text: "Buy",
-        click: ->buy_click
+        click: ->buy_sell_click
       )
 
-      @buttons << Button.new(
-        game: @game,
-        x: @buttons[0].x,
-        y: @buttons[0].y + @buttons[0].height + PADDING,
-        text: "Sell",
-        click: ->sell_click
-      )
-      @buttons[1].disable
+      if @level.number > 1
+        @buttons << Button.new(
+          game: @game,
+          x: @buttons[0].x,
+          y: @buttons[0].y + @buttons[0].height + PADDING,
+          text: "Short",
+          click: ->short_click
+        )
+
+        if @level.number < 3
+          @buttons[1].disable
+        end
+      end
 
       # trades position
       @account_info_trades_position = LibRay::Vector2.new(
@@ -86,15 +91,43 @@ module Tradify
       super(x, y, width, height)
     end
 
-    def buy_click
-      @buttons[0].disable
-      @buttons[1].enable
+    def buy_sell_click
+      if @buttons[0].text == "Buy"
+        buy_click
+        @buttons[0].text = "Sell" if @account.open_trades?
+      else
+        sell_click
+        @buttons[0].text = "Buy"
+      end
 
+      true
+    end
+
+    def buy_click
       price = @chart.price
 
       @account.execute_trade(Trade.new(price: price, action: Action::Buy))
 
       trade_executed(price)
+    end
+
+    def sell_click
+      price = @chart.price
+
+      @account.execute_trade(Trade.new(price: price, action: Action::Sell))
+
+      trade_executed(price)
+    end
+
+    def short_click
+      price = @chart.price
+
+      @account.execute_trade(Trade.new(price: price, action: Action::Short))
+
+      trade_executed(price)
+
+      @buttons[1].disable if @level.number > 2 && @account.open_trades?
+      @buttons[0].text = "Buy"
 
       true
     end
@@ -109,25 +142,8 @@ module Tradify
       end
     end
 
-    def sell_click
-      @buttons[0].enable
-      @buttons[1].disable
-
-      price = @chart.price
-
-      @account.execute_trade(Trade.new(price: price, action: Action::Sell))
-
-      trade_executed(price)
-
-      true
-    end
-
     def update
-      if @account.balance < @chart.price
-        @buttons[0].disable
-      else
-        @buttons[0].enable
-      end
+      update_buttons
 
       update_account_info
 
@@ -137,6 +153,22 @@ module Tradify
 
     def update_account_info
       @account_info_text = "$#{@account.balance}"
+    end
+
+    def update_buttons
+      if @account.balance < @chart.price
+        @buttons[0].disable if @buttons[0].text == "Buy"
+      else
+        @buttons[0].enable
+      end
+
+      if @level.number > 2
+        if @account.open_trades?
+          @buttons[1].disable
+        else
+          @buttons[1].enable
+        end
+      end
     end
 
     def draw
@@ -168,8 +200,8 @@ module Tradify
 
         break if y > @height - MARGIN * 2 - BORDER * 2
 
-        text = "1 @ $#{trade.price}"
-        text = "-" + text if trade.sell?
+        text = trade.to_s
+        text += trade.open? ? " o" : " c" if @level.number > 2
 
         measure = LibRay.measure_text_ex(
           sprite_font: LibRay.get_default_font,

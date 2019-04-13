@@ -4,6 +4,7 @@ module Tradify
   class Button < Component
     getter? disabled
     getter padding : Int32
+    property text
 
     @color : LibRay::Color
     @measure : LibRay::Vector2
@@ -13,7 +14,7 @@ module Tradify
     PADDING   = 15
 
     DEFAULT_COLOR  = LibRay::WHITE
-    DISABLED_COLOR = LibRay::GRAY
+    DISABLED_COLOR = LibRay::Color.new(r: 70, g: 70, b: 70, a: 255)
     HOVER_COLOR    = LibRay::GREEN
 
     def initialize(@game : Game, x, y, @text : String, @click : Proc(Bool), @padding = PADDING)
