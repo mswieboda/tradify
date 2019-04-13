@@ -11,7 +11,7 @@ module Tradify
     SCREEN_WIDTH  = 1024
     SCREEN_HEIGHT =  768
 
-    DEBUG = true
+    DEBUG = false
 
     TARGET_FPS = 60
     DRAW_FPS   = DEBUG
@@ -43,7 +43,7 @@ module Tradify
 
       @message = Message.new
 
-      level = Level.new(self)
+      level = Level1.new(self)
       level.load
       @level = level
     end
