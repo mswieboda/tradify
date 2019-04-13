@@ -10,6 +10,7 @@ module Tradify
     @game : Game
     @chart : Chart
     @account_info_color : LibRay::Color
+    @price_color : LibRay::Color
 
     def initialize(@game, @account : Account, price_data : Array(Int32))
       x = 0
@@ -71,6 +72,17 @@ module Tradify
         price_data: price_data
       )
 
+      # price
+      @price_sprite_font = LibRay.get_default_font
+      @price_font_size = 30
+      @price_spacing = 3
+      @price_text = "$0"
+      @price_color = LibRay::WHITE
+      @price_position = LibRay::Vector2.new(
+        x: MARGIN + BORDER + PADDING * 2,
+        y: MARGIN + BORDER + PADDING * 2
+      )
+
       super(x, y, width, height)
     end
 
@@ -126,6 +138,8 @@ module Tradify
 
       @chart.draw
 
+      draw_price
+
       @buttons.each(&.draw)
 
       draw_border
@@ -176,6 +190,17 @@ module Tradify
           color: color
         )
       end
+    end
+
+    def draw_price
+      LibRay.draw_text_ex(
+        sprite_font: @price_sprite_font,
+        text: "$#{@chart.price}",
+        position: @price_position,
+        font_size: @price_font_size,
+        spacing: @price_spacing,
+        color: @price_color
+      )
     end
 
     def draw_border

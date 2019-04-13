@@ -13,7 +13,7 @@ module Tradify
     LINE_THICKNESS_RATIO = 2.0
     POINT_SIZE           = LINE_THICKNESS * 1.5
 
-    DATA_INTERVAL = 0.25
+    DATA_INTERVAL = 0.5
 
     def initialize(x, y, width, height, @price_data : Array(Int32), @order_price_avg : Int32 = 0)
       super(x, y, width, height)
