@@ -7,18 +7,19 @@ module Tradify
     GRID_SIZE      = 50
     GRID_THICKNESS =  1
 
-    POINT_SIZE           =   4
     LINE_THICKNESS       =   4
     LINE_THICKNESS_RATIO = 2.0
+    POINT_SIZE           = LINE_THICKNESS * 1.5
 
     POINTS = [50, 70, 90, 40, 60, 30, 80, 100, 130, 150, 130, 110, 100, 90, 110, 130, 120, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
 
     DATA_INTERVAL = 0.25
 
-    def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32)
+    def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32, @price_data : Array(Int32) = POINTS)
       @timer = Timer.new(DATA_INTERVAL)
-      @point_index = 0
-      @points = [] of Int32
+      @price_index = 0
+      @prices = [] of Int32
+      @view_x = @view_y = 0
     end
 
     def initialize
@@ -30,10 +31,11 @@ module Tradify
 
       @timer.increase(delta_t)
 
-      if @timer.done?
-        @points << POINTS[@point_index]
-        @point_index += 1
-        @point_index = 0 if @point_index >= POINTS.size
+      # @view_x =
+      if @timer.done? && @price_data.any?
+        @prices << @price_data[@price_index]
+        @price_index += 1
+        @price_index = 0 if @price_index >= @price_data.size
         @timer.restart
       end
     end
@@ -88,19 +90,21 @@ module Tradify
       last_px = 0
       last_py = 0
 
-      @points.each_with_index do |point, point_x|
-        px = @x + point_x * GRID_SIZE / 2 - POINT_SIZE / 2
-        py = @y + @height / 2 + point - POINT_SIZE / 2
+      @prices.each_with_index do |price, price_x|
+        px = @x + price_x * GRID_SIZE / 2
+        py = @y + @height / 2 + price
 
-        # point
-        LibRay.draw_rectangle_v(
-          position: LibRay::Vector2.new(x: px, y: py),
-          size: LibRay::Vector2.new(x: POINT_SIZE, y: POINT_SIZE),
-          color: PLOT_COLOR
-        )
+        # points
+        if Game::DEBUG
+          LibRay.draw_rectangle_v(
+            position: LibRay::Vector2.new(x: px - POINT_SIZE / 2, y: py - POINT_SIZE / 2),
+            size: LibRay::Vector2.new(x: POINT_SIZE, y: POINT_SIZE),
+            color: PLOT_COLOR
+          )
+        end
 
         # lines
-        if point_x > 0
+        if price_x > 0
           LINE_THICKNESS.times do |thickness|
             LibRay.draw_line_v(
               start_pos: LibRay::Vector2.new(x: last_px, y: last_py + thickness / LINE_THICKNESS_RATIO),
