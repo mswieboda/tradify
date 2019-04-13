@@ -2,8 +2,7 @@ module Tradify
   class Account
     property balance : Int32
 
-    def initialize
-      @balance = 0
+    def initialize(@balance)
     end
   end
 end

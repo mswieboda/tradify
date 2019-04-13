@@ -8,7 +8,7 @@ module Tradify
 
     def initialize(@game : Game)
       @loaded = false
-      @account = Account.new
+      @account = Account.new(balance: 1000)
       @screen = Screen.new(
         game: @game,
         account: @account,

@@ -71,7 +71,7 @@ module Tradify
 
     def draw_grid
       # vertical
-      ((@width / GRID_SIZE).round + 1).times do |grid_x|
+      ((@width / GRID_SIZE) + 1).times do |grid_x|
         LibRay.draw_rectangle_v(
           position: LibRay::Vector2.new(
             x: @x + grid_x * GRID_SIZE,
@@ -86,7 +86,7 @@ module Tradify
       end
 
       # horizontal
-      ((@height / GRID_SIZE).round + 1).times do |grid_y|
+      ((@height / GRID_SIZE) + 1).times do |grid_y|
         LibRay.draw_rectangle_v(
           position: LibRay::Vector2.new(
             x: @x,
