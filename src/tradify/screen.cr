@@ -129,14 +129,18 @@ module Tradify
     end
 
     def short_click
-      price = @chart.price
+      if @buttons[1].text == "Sell"
+        sell_click
+      else
+        price = @chart.price
 
-      @account.execute_trade(Trade.new(action: Action::Short, price: price))
+        @account.execute_trade(Trade.new(action: Action::Short, price: price))
 
-      trade_executed(price)
+        trade_executed(price)
 
-      @buttons[1].disable if @level.number > 2 && @level.number <= 3 && @account.open_trades?
-      @buttons[0].text = "Buy"
+        @buttons[1].disable if @level.number > 2 && @level.number <= 3 && @account.open_trades?
+        @buttons[0].text = "Buy"
+      end
 
       if @level.number >= 4
         if @account.open_buy_trades?

@@ -61,7 +61,7 @@ module Tradify
     end
 
     def target_reached?
-      @account.balance >= INITIAL_BALANCE + TARGET_PROFIT
+      !@account.open_trades? && @account.balance >= INITIAL_BALANCE + TARGET_PROFIT
     end
 
     def target_reached_message

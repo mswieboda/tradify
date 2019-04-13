@@ -20,11 +20,11 @@ module Tradify
     end
 
     def target_reached?
-      @account.balance >= INITIAL_BALANCE + TARGET_PROFIT
+      !@account.open_trades? && @account.balance > INITIAL_BALANCE + TARGET_PROFIT
     end
 
     def target_reached_message
-      "Congrats, you made a profit of $#{TARGET_PROFIT}!"
+      "Congrats, you made a profit of over $#{TARGET_PROFIT}!"
     end
   end
 end
