@@ -1,8 +1,8 @@
+require "./component"
+
 module Tradify
-  class Button
+  class Button < Component
     getter? disabled
-    getter width : Float32
-    getter height : Float32
     getter padding : Int32
 
     @color : LibRay::Color
@@ -16,15 +16,18 @@ module Tradify
     DISABLED_COLOR = LibRay::GRAY
     HOVER_COLOR    = LibRay::GREEN
 
-    def initialize(@game : Game, @x : Float32, @y : Float32, @text : String, @click : Proc(Bool), @padding = PADDING)
+    def initialize(@game : Game, x, y, @text : String, @click : Proc(Bool), @padding = PADDING)
       @measure = LibRay.measure_text_ex(
         sprite_font: LibRay.get_default_font,
         text: @text,
         font_size: FONT_SIZE,
         spacing: SPACING
       )
-      @width = @measure.x + @padding * 2
-      @height = @measure.y + @padding * 2
+      width = @measure.x.round.to_i + @padding * 2
+      height = @measure.y.round.to_i + @padding * 2
+
+      super(x, y, width, height)
+
       @color = DEFAULT_COLOR
       @disabled = false
     end

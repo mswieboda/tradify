@@ -1,5 +1,5 @@
 module Tradify
-  class Chart
+  class Chart < Component
     property order_price_avg : Int32
 
     BACKGROUND_COLOR = LibRay::Color.new(r: 30, g: 30, b: 30, a: 0)
@@ -15,7 +15,9 @@ module Tradify
 
     DATA_INTERVAL = 0.25
 
-    def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32, @price_data : Array(Int32), @order_price_avg : Int32 = 0)
+    def initialize(x, y, width, height, @price_data : Array(Int32), @order_price_avg : Int32 = 0)
+      super(x, y, width, height)
+
       @timer = Timer.new(DATA_INTERVAL)
       @price_index = 0
       @prices = [] of Int32

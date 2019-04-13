@@ -8,18 +8,15 @@ module Tradify
 
     def initialize(@game : Game)
       @loaded = false
-      @screen = Screen.new(@game)
+      @account = Account.new
+      @screen = Screen.new(
+        game: @game,
+        account: @account,
+        price_data: PRICE_DATA
+      )
     end
 
     def load
-      @screen = Screen.new(
-        game: @game,
-        x: 0,
-        y: 0,
-        width: Game::SCREEN_WIDTH,
-        height: Game::SCREEN_HEIGHT,
-        price_data: PRICE_DATA
-      )
     end
 
     def start
