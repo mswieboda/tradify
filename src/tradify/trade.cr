@@ -3,11 +3,12 @@ module Tradify
     getter price : Int32
     getter action : Action
     getter? open
+    getter quantity : Int32
     delegate buy?, to: @action
     delegate sell?, to: @action
     delegate short?, to: @action
 
-    def initialize(@price, @action)
+    def initialize(@action, @price, @quantity = 1)
       @open = true
     end
 

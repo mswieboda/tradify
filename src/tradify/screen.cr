@@ -94,10 +94,19 @@ module Tradify
     def buy_sell_click
       if @buttons[0].text == "Buy"
         buy_click
-        @buttons[0].text = "Sell" if @account.open_trades?
+        @buttons[0].text = "Sell" if @account.open_trades? && @level.number < 4
+
+        if @level.number >= 4
+          if @account.open_buy_trades?
+            @buttons[1].text = "Sell"
+          else
+            @buttons[1].text = "Short"
+          end
+        end
       else
         sell_click
-        @buttons[0].text = "Buy"
+
+        @buttons[0].text = "Buy" if @level.number < 4
       end
 
       true
@@ -106,7 +115,7 @@ module Tradify
     def buy_click
       price = @chart.price
 
-      @account.execute_trade(Trade.new(price: price, action: Action::Buy))
+      @account.execute_trade(Trade.new(action: Action::Buy, price: price))
 
       trade_executed(price)
     end
@@ -114,7 +123,7 @@ module Tradify
     def sell_click
       price = @chart.price
 
-      @account.execute_trade(Trade.new(price: price, action: Action::Sell))
+      @account.execute_trade(Trade.new(action: Action::Sell, price: price))
 
       trade_executed(price)
     end
@@ -122,12 +131,20 @@ module Tradify
     def short_click
       price = @chart.price
 
-      @account.execute_trade(Trade.new(price: price, action: Action::Short))
+      @account.execute_trade(Trade.new(action: Action::Short, price: price))
 
       trade_executed(price)
 
-      @buttons[1].disable if @level.number > 2 && @account.open_trades?
+      @buttons[1].disable if @level.number > 2 && @level.number <= 3 && @account.open_trades?
       @buttons[0].text = "Buy"
+
+      if @level.number >= 4
+        if @account.open_buy_trades?
+          @buttons[1].text = "Sell"
+        else
+          @buttons[1].text = "Short"
+        end
+      end
 
       true
     end
@@ -136,7 +153,9 @@ module Tradify
       update_account_info
 
       if @account.open_trades?
-        @chart.order_price_avg = price
+        open_prices = @account.trades.select(&.open?).map(&.price)
+        avg_price = open_prices.sum / open_prices.size
+        @chart.order_price_avg = avg_price
       else
         @chart.order_price_avg = 0
       end
@@ -158,11 +177,12 @@ module Tradify
     def update_buttons
       if @account.balance < @chart.price
         @buttons[0].disable if @buttons[0].text == "Buy"
+        @buttons[1].disable if @buttons[1].text == "Short"
       else
         @buttons[0].enable
       end
 
-      if @level.number > 2
+      if @level.number > 2 && @level.number <= 3
         if @account.open_trades?
           @buttons[1].disable
         else
