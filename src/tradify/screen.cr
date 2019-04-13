@@ -8,7 +8,7 @@ module Tradify
 
     @chart : Chart
 
-    def initialize(@game : Game, @x : Int32, @y : Int32, @width : Int32, @height : Int32, price_data : Array(Int32) = [] of Int32)
+    def initialize(@game : Game, @x : Int32, @y : Int32, @width : Int32, @height : Int32, price_data : Array(Int32))
       @buttons = [] of Button
 
       action_width = 150
@@ -38,22 +38,32 @@ module Tradify
     end
 
     def initialize(game)
-      initialize(game: game, x: 0, y: 0, width: 0, height: 0)
+      initialize(game: game, x: 0, y: 0, width: 0, height: 0, price_data: [] of Int32)
     end
 
     def buy_click
-      message = TypedMessage.new("You clicked buy!")
-      @game.show(message)
       @buttons[0].disable
       @buttons[1].enable
+
+      price = @chart.price
+      @chart.order_price_avg = price
+
+      message = TypedMessage.new("Bought at: #{price}!")
+      @game.show(message)
+
       true
     end
 
     def sell_click
-      message = TypedMessage.new("You clicked sell!")
-      @game.show(message)
       @buttons[0].enable
       @buttons[1].disable
+
+      price = @chart.price
+      @chart.order_price_avg = price
+
+      message = TypedMessage.new("Sold at: #{price}!")
+      @game.show(message)
+
       true
     end
 
