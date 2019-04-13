@@ -22,7 +22,7 @@ module Tradify
     def start
       # ran once the level is loaded, and first update and draw ran
       message = TypedMessage.new(["Welcome to Tradify.", "Try to make money by buying and selling!"])
-      @game.show(message)
+      # @game.show(message)
     end
 
     def draw
