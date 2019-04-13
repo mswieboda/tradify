@@ -13,7 +13,7 @@ module Tradify
 
     POINTS = [50, 70, 90, 40, 60, 30, 80, 100, 130, 150, 130, 110, 100, 90, 110, 130, 120, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
 
-    DATA_INTERVAL = 0.5
+    DATA_INTERVAL = 0.25
 
     def initialize(@x : Int32, @y : Int32, @width : Int32, @height : Int32)
       @timer = Timer.new(DATA_INTERVAL)
@@ -85,8 +85,8 @@ module Tradify
     end
 
     def draw_plot
-      last_px = @x - POINT_SIZE / 2
-      last_py = @y + @height / 2 - POINT_SIZE / 2
+      last_px = 0
+      last_py = 0
 
       @points.each_with_index do |point, point_x|
         px = @x + point_x * GRID_SIZE / 2 - POINT_SIZE / 2
@@ -99,26 +99,20 @@ module Tradify
           color: PLOT_COLOR
         )
 
-        # line
-        LibRay.draw_line_v(
-          start_pos: LibRay::Vector2.new(x: last_px, y: last_py),
-          end_pos: LibRay::Vector2.new(x: px, y: py),
-          color: PLOT_COLOR
-        )
-
-        # thickness
-        LINE_THICKNESS.times do |thickness|
-          # puts "t: #{thickness}"
-          LibRay.draw_line_v(
-            start_pos: LibRay::Vector2.new(x: last_px, y: last_py + thickness / LINE_THICKNESS_RATIO),
-            end_pos: LibRay::Vector2.new(x: px, y: py + thickness / LINE_THICKNESS_RATIO),
-            color: PLOT_COLOR
-          )
-          LibRay.draw_line_v(
-            start_pos: LibRay::Vector2.new(x: last_px, y: last_py - thickness / LINE_THICKNESS_RATIO),
-            end_pos: LibRay::Vector2.new(x: px, y: py - thickness / LINE_THICKNESS_RATIO),
-            color: PLOT_COLOR
-          )
+        # lines
+        if point_x > 0
+          LINE_THICKNESS.times do |thickness|
+            LibRay.draw_line_v(
+              start_pos: LibRay::Vector2.new(x: last_px, y: last_py + thickness / LINE_THICKNESS_RATIO),
+              end_pos: LibRay::Vector2.new(x: px, y: py + thickness / LINE_THICKNESS_RATIO),
+              color: PLOT_COLOR
+            )
+            LibRay.draw_line_v(
+              start_pos: LibRay::Vector2.new(x: last_px, y: last_py - thickness / LINE_THICKNESS_RATIO),
+              end_pos: LibRay::Vector2.new(x: px, y: py - thickness / LINE_THICKNESS_RATIO),
+              color: PLOT_COLOR
+            )
+          end
         end
 
         last_px = px
