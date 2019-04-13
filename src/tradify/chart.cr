@@ -21,7 +21,7 @@ module Tradify
       @timer = Timer.new(DATA_INTERVAL)
       @price_index = 0
       @prices = [] of Int32
-      @view_x = @view_y = 0
+      @view_x = @view_y = @init_price = 0
     end
 
     def initialize
@@ -38,6 +38,10 @@ module Tradify
       @price_data[@price_index % @price_data.size]
     end
 
+    def y_origin
+      @y + @height / 2 - @prices.first / 2
+    end
+
     def update
       delta_t = LibRay.get_frame_time
 
@@ -45,7 +49,9 @@ module Tradify
 
       @view_x = @price_index * GRID_SIZE / 2 - @width
       @view_x = 0 if @view_x < 0
-      @view_y = 0
+
+      @init_price = @prices.any? ? @prices.first : 0
+      @view_y = @y + @height / 2 + @init_price
 
       if @timer.done? && @price_data.any?
         @prices << next_price
@@ -57,6 +63,7 @@ module Tradify
     def draw
       draw_background
       draw_grid
+      draw_init_price_line
       draw_plot
       draw_order_price_avg_line
     end
@@ -107,13 +114,13 @@ module Tradify
 
       @prices.each_with_index do |price, price_x|
         px = @x + price_x * GRID_SIZE / 2
-        py = @y + @height / 2 - price
+        py = -price
 
         unless px < @x + @view_x || px > @x + @view_x + @width
           # points
           if Game::DEBUG
             LibRay.draw_rectangle_v(
-              position: LibRay::Vector2.new(x: px - @view_x - POINT_SIZE / 2, y: py - POINT_SIZE / 2),
+              position: LibRay::Vector2.new(x: px - @view_x - POINT_SIZE / 2, y: py + @view_y - POINT_SIZE / 2),
               size: LibRay::Vector2.new(x: POINT_SIZE, y: POINT_SIZE),
               color: PLOT_COLOR
             )
@@ -123,13 +130,13 @@ module Tradify
           if price_x > 0
             LINE_THICKNESS.times do |thickness|
               LibRay.draw_line_v(
-                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py + thickness / LINE_THICKNESS_RATIO),
-                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py + thickness / LINE_THICKNESS_RATIO),
+                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py + @view_y + thickness / LINE_THICKNESS_RATIO),
+                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py + @view_y + thickness / LINE_THICKNESS_RATIO),
                 color: PLOT_COLOR
               )
               LibRay.draw_line_v(
-                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py - thickness / LINE_THICKNESS_RATIO),
-                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py - thickness / LINE_THICKNESS_RATIO),
+                start_pos: LibRay::Vector2.new(x: last_px - @view_x, y: last_py + @view_y - thickness / LINE_THICKNESS_RATIO),
+                end_pos: LibRay::Vector2.new(x: px - @view_x, y: py + @view_y - thickness / LINE_THICKNESS_RATIO),
                 color: PLOT_COLOR
               )
             end
@@ -141,22 +148,30 @@ module Tradify
       end
     end
 
+    def draw_plot_line(price, thickness, color)
+      y = -price
+
+      thickness.times do |offset|
+        LibRay.draw_line_v(
+          start_pos: LibRay::Vector2.new(x: @x, y: y + @view_y + offset / LINE_THICKNESS_RATIO),
+          end_pos: LibRay::Vector2.new(x: @x + @width, y: y + @view_y + offset / LINE_THICKNESS_RATIO),
+          color: color
+        )
+        LibRay.draw_line_v(
+          start_pos: LibRay::Vector2.new(x: @x, y: y + @view_y - offset / LINE_THICKNESS_RATIO),
+          end_pos: LibRay::Vector2.new(x: @x + @width, y: y + @view_y - offset / LINE_THICKNESS_RATIO),
+          color: color
+        )
+      end
+    end
+
+    def draw_init_price_line
+      draw_plot_line(@init_price, LINE_THICKNESS, GRID_COLOR)
+    end
+
     def draw_order_price_avg_line
       if @order_price_avg > 0
-        y = @y + @height / 2 - @order_price_avg
-
-        LINE_THICKNESS.times do |thickness|
-          LibRay.draw_line_v(
-            start_pos: LibRay::Vector2.new(x: @x, y: y + thickness / LINE_THICKNESS_RATIO),
-            end_pos: LibRay::Vector2.new(x: @x + @width, y: y + thickness / LINE_THICKNESS_RATIO),
-            color: PLOT_COLOR
-          )
-          LibRay.draw_line_v(
-            start_pos: LibRay::Vector2.new(x: @x, y: y - thickness / LINE_THICKNESS_RATIO),
-            end_pos: LibRay::Vector2.new(x: @x + @width, y: y - thickness / LINE_THICKNESS_RATIO),
-            color: PLOT_COLOR
-          )
-        end
+        draw_plot_line(@order_price_avg, LINE_THICKNESS, LibRay::BLUE)
       end
     end
   end
