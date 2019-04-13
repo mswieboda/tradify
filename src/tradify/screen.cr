@@ -56,6 +56,12 @@ module Tradify
       )
       @buttons[1].disable
 
+      # trades position
+      @account_info_trades_position = LibRay::Vector2.new(
+        x: @account_info_position.x,
+        y: @buttons[-1].y + @buttons[-1].height + PADDING
+      )
+
       # chart
       @chart = Chart.new(
         x: MARGIN + BORDER + PADDING,
@@ -73,13 +79,22 @@ module Tradify
       @buttons[1].enable
 
       price = @chart.price
-      @chart.order_price_avg = price
-      @account.balance -= price
 
-      message = TypedMessage.new("Bought at: #{price}!")
-      @game.show(message)
+      @account.execute_trade(Trade.new(price: price, action: Action::Buy))
+
+      trade_executed(price)
 
       true
+    end
+
+    def trade_executed(price)
+      update_account_info
+
+      if @account.open_trades?
+        @chart.order_price_avg = price
+      else
+        @chart.order_price_avg = 0
+      end
     end
 
     def sell_click
@@ -87,24 +102,29 @@ module Tradify
       @buttons[1].disable
 
       price = @chart.price
-      @chart.order_price_avg = price
-      @account.balance += price
 
-      message = TypedMessage.new("Sold at: #{price}!")
-      @game.show(message)
+      @account.execute_trade(Trade.new(price: price, action: Action::Sell))
+
+      trade_executed(price)
 
       true
     end
 
     def update
+      update_account_info
+
       @chart.update
       @buttons.each(&.update)
     end
 
-    def draw
-      @chart.draw
+    def update_account_info
+      @account_info_text = "$#{@account.balance}"
+    end
 
+    def draw
       draw_account_info
+
+      @chart.draw
 
       @buttons.each(&.draw)
 
@@ -112,6 +132,7 @@ module Tradify
     end
 
     def draw_account_info
+      # balance
       LibRay.draw_text_ex(
         sprite_font: @account_info_sprite_font,
         text: @account_info_text,
@@ -120,6 +141,41 @@ module Tradify
         spacing: @account_info_spacing,
         color: @account_info_color
       )
+
+      # trades
+      @account.trades.reverse.each_with_index do |trade, trade_index|
+        y = @account_info_trades_position.y + @account_info_measure.y + PADDING * trade_index
+
+        break if y > @height - MARGIN * 2 - BORDER * 2
+
+        text = "1 @ $#{trade.price}"
+        text = "-" + text if trade.sell?
+
+        measure = LibRay.measure_text_ex(
+          sprite_font: LibRay.get_default_font,
+          text: text,
+          font_size: @account_info_font_size,
+          spacing: @account_info_spacing
+        )
+
+        if trade.open?
+          color = LibRay::WHITE
+        else
+          color = LibRay::GRAY
+        end
+
+        LibRay.draw_text_ex(
+          sprite_font: @account_info_sprite_font,
+          text: text,
+          position: LibRay::Vector2.new(
+            x: width - MARGIN - BORDER - PADDING - measure.x,
+            y: @account_info_trades_position.y + @account_info_measure.y + PADDING * trade_index,
+          ),
+          font_size: @account_info_font_size,
+          spacing: @account_info_spacing,
+          color: color
+        )
+      end
     end
 
     def draw_border
