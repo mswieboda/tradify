@@ -17,7 +17,7 @@ module Tradify
     DISABLED_COLOR = LibRay::Color.new(r: 70, g: 70, b: 70, a: 255)
     HOVER_COLOR    = LibRay::GREEN
 
-    def initialize(@game : Game, x, y, @text : String, @click : Proc(Bool), @padding = PADDING)
+    def initialize(@game : Game, x, y, @text : String, @click : Proc(Bool) = ->{ false }, @padding = PADDING)
       @measure = LibRay.measure_text_ex(
         sprite_font: LibRay.get_default_font,
         text: @text,
@@ -47,12 +47,12 @@ module Tradify
       !disabled?
     end
 
-    def update
+    def update(px, py)
       return if disabled?
 
       mouse = LibRay.get_mouse_position
 
-      if over?(mouse)
+      if over?(px, py, mouse)
         @color = HOVER_COLOR
 
         click if LibRay.mouse_button_pressed?(LibRay::MOUSE_LEFT_BUTTON)
@@ -61,28 +61,30 @@ module Tradify
       end
     end
 
-    def over?(mouse)
-      mouse.x >= @x && mouse.x <= @x + width &&
-        mouse.y >= @y && mouse.y <= @y + height
+    def over?(px, py, mouse)
+      mouse.x >= px + @x && mouse.x <= px + @x + width &&
+        mouse.y >= py + @y && mouse.y <= py + @y + height
     end
 
     def click
       @click.call
     end
 
-    def draw
+    def draw(px, py)
       LibRay.draw_text_ex(
         sprite_font: LibRay.get_default_font,
         text: @text,
-        position: LibRay::Vector2.new(x: @x + @width / 2 - @measure.x / 2, y: @y + @height / 2 - @measure.y / 2),
+        position: LibRay::Vector2.new(x: px + @x + @width / 2 - @measure.x / 2,
+          y: py + @y + @height / 2 - @measure.y / 2
+        ),
         font_size: FONT_SIZE,
         spacing: SPACING,
         color: @color
       )
 
       LibRay.draw_rectangle_lines(
-        pos_x: @x,
-        pos_y: @y,
+        pos_x: px + @x,
+        pos_y: py + @y,
         width: @width,
         height: @height,
         color: @color

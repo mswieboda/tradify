@@ -12,6 +12,26 @@ module Tradify
         price_data: PRICE_DATA,
         level: self
       )
+
+      # if @level.number > 1
+      #   @buttons << Button.new(
+      #     game: @game,
+      #     x: @buttons[0].x,
+      #     y: @buttons[0].y + @buttons[0].height + PADDING,
+      #     text: "Short",
+      #     click: ->short_click
+      #   )
+
+      #   if @level.number < 3
+      #     @buttons[1].disable
+      #   end
+      # end
+
+      # # trades position
+      # @account_info_trades_position = LibRay::Vector2.new(
+      #   x: @account_info_position.x,
+      #   y: @buttons[-1].y + @buttons[-1].height + PADDING
+      # )
     end
 
     def start

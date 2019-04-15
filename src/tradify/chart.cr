@@ -42,7 +42,7 @@ module Tradify
       @y + @height / 2 - @prices.first / 2
     end
 
-    def update
+    def update(px, py)
       delta_t = LibRay.get_frame_time
 
       @timer.increase(delta_t)
