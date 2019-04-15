@@ -50,18 +50,13 @@ module Tradify
       )
 
       # trades position
-      puts side_panel_components.last.y
-      puts side_panel_components.last.height
-
-      trades_list = TradesList.new(
+      side_panel_components << TradesList.new(
         account: @account,
         x: side_panel_components.last.x,
         y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
         width: side_panel.width,
-        height: 150
+        height: side_panel.height - side_panel_components.map(&.width).sum - Screen::PADDING
       )
-      side_panel_components << trades_list
-      puts trades_list.height
     end
 
     def start

@@ -39,7 +39,7 @@ module Tradify
           sprite_font: LibRay.get_default_font,
           text: text,
           position: LibRay::Vector2.new(
-            x: px + @x,
+            x: px + @x + width - measure.x - Screen::BORDER * 2 - Screen::PADDING,
             y: y,
           ),
           font_size: Label::FONT_SIZE,
