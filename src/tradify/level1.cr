@@ -36,7 +36,7 @@ module Tradify
 
       # side panel
       side_panel = Component.new(
-        width: side_panel_components.map(&.width).max + Screen::PADDING,
+        width: [150, side_panel_components.map(&.width).max + Screen::PADDING].max,
         components: side_panel_components
       )
 
@@ -48,6 +48,20 @@ module Tradify
         level: self,
         side_panel: side_panel
       )
+
+      # trades position
+      puts side_panel_components.last.y
+      puts side_panel_components.last.height
+
+      trades_list = TradesList.new(
+        account: @account,
+        x: side_panel_components.last.x,
+        y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
+        width: side_panel.width,
+        height: 150
+      )
+      side_panel_components << trades_list
+      puts trades_list.height
     end
 
     def start
@@ -65,6 +79,10 @@ module Tradify
 
     def sell_button
       @sell_button.as(Button)
+    end
+
+    def trades_position
+      @trades_position.as(LibRay::Vector2)
     end
 
     def update

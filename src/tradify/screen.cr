@@ -51,171 +51,33 @@ module Tradify
       super(x, y, width, height, [side_panel])
     end
 
-    # def buy_sell_click
-    #   if @buttons[0].text == "Buy"
-    #     buy_click
-    #     @buttons[0].text = "Sell" if @account.open_trades? && @level.number < 4
-
-    #     if @level.number >= 4
-    #       if @account.open_buy_trades?
-    #         @buttons[1].text = "Sell"
-    #       else
-    #         @buttons[1].text = "Short"
-    #       end
-    #     end
-    #   else
-    #     sell_click
-
-    #     @buttons[0].text = "Buy" if @level.number < 4
-    #   end
-
-    #   true
-    # end
-
-    # def buy_click
-    #   price = @chart.price
-
-    #   @account.execute_trade(Trade.new(action: Action::Buy, price: price))
-
-    #   trade_executed(price)
-    # end
-
-    # def sell_click
-    #   price = @chart.price
-
-    #   @account.execute_trade(Trade.new(action: Action::Sell, price: price))
-
-    #   trade_executed(price)
-    # end
-
-    # def short_click
-    #   if @buttons[1].text == "Sell"
-    #     sell_click
-    #   else
-    #     price = @chart.price
-
-    #     @account.execute_trade(Trade.new(action: Action::Short, price: price))
-
-    #     trade_executed(price)
-
-    #     @buttons[1].disable if @level.number > 2 && @level.number <= 3 && @account.open_trades?
-    #     @buttons[0].text = "Buy"
-    #   end
-
-    #   if @level.number >= 4
-    #     if @account.open_buy_trades?
-    #       @buttons[1].text = "Sell"
-    #     else
-    #       @buttons[1].text = "Short"
-    #     end
-    #   end
-
-    #   true
-    # end
-
-    # def trade_executed(price)
-    #   update_account_info
-
-    #   if @account.open_trades?
-    #     open_prices = @account.trades.select(&.open?).map(&.price)
-    #     avg_price = open_prices.sum / open_prices.size
-    #     @chart.order_price_avg = avg_price
-    #   else
-    #     @chart.order_price_avg = 0
-    #   end
-    # end
+    def update_chart_lines
+      if @account.open_trades?
+        open_prices = @account.trades.select(&.open?).map(&.price)
+        avg_price = open_prices.sum / open_prices.size
+        @chart.order_price_avg = avg_price
+      else
+        @chart.order_price_avg = 0
+      end
+    end
 
     def update(px, py)
       super(px + @x + @side_panel_x, py + @y + @side_panel_y)
-      # update_buttons
-
-      # update_account_info
 
       @chart.update(px, py)
-      # @buttons.each(&.update)
+
+      update_chart_lines
     end
-
-    # def update_account_info
-    #   @account_info_text = "$#{@account.balance}"
-    # end
-
-    # def update_buttons
-    #   if @account.balance < @chart.price
-    #     @buttons[0].disable if @buttons[0].text == "Buy"
-    #     @buttons[1].disable if @buttons[1].text == "Short"
-    #   else
-    #     @buttons[0].enable
-    #   end
-
-    #   if @level.number > 2 && @level.number <= 3
-    #     if @account.open_trades?
-    #       @buttons[1].disable
-    #     else
-    #       @buttons[1].enable
-    #     end
-    #   end
-    # end
 
     def draw(px, py)
       super(@side_panel_x, @side_panel_y)
-
-      # draw_account_info
 
       @chart.draw
 
       draw_price
 
-      # @buttons.each(&.draw)
-
       draw_border
     end
-
-    # def draw_account_info
-    #   # balance
-    #   LibRay.draw_text_ex(
-    #     sprite_font: @account_info_sprite_font,
-    #     text: @account_info_text,
-    #     position: @account_info_position,
-    #     font_size: @account_info_font_size,
-    #     spacing: @account_info_spacing,
-    #     color: @account_info_color
-    #   )
-
-    #   # trades
-    #   @account.trades.reverse.each_with_index do |trade, trade_index|
-    #     y = @account_info_trades_position.y + @account_info_measure.y + PADDING * trade_index
-
-    #     break if y > @height - MARGIN * 2 - BORDER * 2
-
-    #     text = trade.to_s
-    #     text += trade.open? ? " o" : " c" if @level.number > 2
-
-    #     measure = LibRay.measure_text_ex(
-    #       sprite_font: LibRay.get_default_font,
-    #       text: text,
-    #       font_size: @account_info_font_size,
-    #       spacing: @account_info_spacing
-    #     )
-
-    #     if trade.open?
-    #       color = LibRay::WHITE
-    #     else
-    #       color = LibRay::GRAY
-    #     end
-
-    #     LibRay.draw_text_ex(
-    #       sprite_font: @account_info_sprite_font,
-    #       text: text,
-    #       position: LibRay::Vector2.new(
-    #         x: width - MARGIN - BORDER - PADDING - measure.x,
-    #         y: @account_info_trades_position.y + @account_info_measure.y + PADDING * trade_index,
-    #       ),
-    #       font_size: @account_info_font_size,
-    #       spacing: @account_info_spacing,
-    #       color: color
-    #     )
-    #   end
-    # end
 
     def draw_price
       LibRay.draw_text_ex(
