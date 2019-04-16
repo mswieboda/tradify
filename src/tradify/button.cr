@@ -47,6 +47,17 @@ module Tradify
       !disabled?
     end
 
+    def remeasure
+      @measure = LibRay.measure_text_ex(
+        sprite_font: LibRay.get_default_font,
+        text: @text,
+        font_size: FONT_SIZE,
+        spacing: SPACING
+      )
+      @width = @measure.x.round.to_i + @padding * 2
+      @height = @measure.y.round.to_i + @padding * 2
+    end
+
     def update(px, py)
       return if disabled?
 

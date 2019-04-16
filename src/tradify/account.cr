@@ -11,13 +11,13 @@ module Tradify
       @trades << trade
 
       if trade.buy?
-        if last_sell_or_short
-          last = last_sell_or_short.as(Trade)
-          last.close
+        if first_sell_or_short
+          first = first_sell_or_short.as(Trade)
+          first.close
           trade.close
 
-          if last.short?
-            @balance += (last.price - trade.price) + last.price
+          if first.short?
+            @balance += (first.price - trade.price) + first.price
             return
           end
         end
@@ -26,15 +26,15 @@ module Tradify
       elsif trade.sell?
         @balance += trade.price
 
-        if last_buy
-          last_buy.as(Trade).close
+        if first_buy
+          first_buy.as(Trade).close
           trade.close
         end
       elsif trade.short?
         @balance -= trade.price
 
-        if last_buy
-          last_buy.as(Trade).close
+        if first_buy
+          first_buy.as(Trade).close
           trade.close
         end
       end
@@ -48,14 +48,14 @@ module Tradify
       @trades.select { |t| t.open? && t.buy? }.any?
     end
 
-    def last_buy
+    def first_buy
       open_buys = @trades.select { |t| t.open? && t.buy? }
-      open_buys.last if open_buys.any?
+      open_buys.first if open_buys.any?
     end
 
-    def last_sell_or_short
+    def first_sell_or_short
       open_sell_or_shorts = @trades.select { |t| t.open? && (t.sell? || t.short?) }
-      open_sell_or_shorts.last if open_sell_or_shorts.any?
+      open_sell_or_shorts.first if open_sell_or_shorts.any?
     end
   end
 end

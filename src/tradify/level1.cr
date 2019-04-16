@@ -4,8 +4,8 @@ module Tradify
     TARGET_PROFIT   =  100
     PRICE_DATA      = [70, 50, 70, 90, 40, 20, 15, 30, 10, 20, 30, 40, 45, 30, 50, 70, 60, 80, 100, 130, 150, 190, 140, 130, 110, 100, 90, 110, 130, 120, 150, 140, 160, 100, 90, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
 
-    def load
-      @account = Account.new(balance: INITIAL_BALANCE)
+    def load(balance = INITIAL_BALANCE)
+      @account = Account.new(balance: balance)
 
       side_panel_components = [] of Component
 
@@ -13,26 +13,7 @@ module Tradify
       @balance_label = Label.new(0, 0, text: "$#{@account.balance}")
       side_panel_components << @balance_label.as(Component)
 
-      # buy
-      @buy_button = Button.new(
-        game: @game,
-        x: side_panel_components.last.x,
-        y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
-        text: "Buy",
-        click: ->buy_click
-      )
-      side_panel_components << @buy_button.as(Component)
-
-      # sell
-      @sell_button = Button.new(
-        game: @game,
-        x: side_panel_components.last.x,
-        y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
-        text: "Sell",
-        click: ->sell_click
-      )
-      sell_button.disable
-      side_panel_components << @sell_button.as(Component)
+      load_buttons(side_panel_components)
 
       # side panel
       side_panel = Component.new(
@@ -59,6 +40,29 @@ module Tradify
       )
     end
 
+    def load_buttons(side_panel_components)
+      # buy
+      @buy_button = Button.new(
+        game: @game,
+        x: side_panel_components.last.x,
+        y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
+        text: "Buy",
+        click: buy_click_proc
+      )
+      side_panel_components << @buy_button.as(Component)
+
+      # sell
+      @sell_button = Button.new(
+        game: @game,
+        x: side_panel_components.last.x,
+        y: side_panel_components.last.y + side_panel_components.last.height + Screen::PADDING,
+        text: "Sell",
+        click: sell_click_proc
+      )
+      sell_button.disable
+      side_panel_components << @sell_button.as(Component)
+    end
+
     def start
       # ran once the level is loaded, and first update and draw ran
       @game.show(TypedMessage.new(["Welcome to Tradify.", "Try to make money by buying and selling!"])) unless Game::DEBUG
@@ -72,8 +76,16 @@ module Tradify
       @buy_button.as(Button)
     end
 
+    def buy_click_proc
+      ->buy_click
+    end
+
     def sell_button
       @sell_button.as(Button)
+    end
+
+    def sell_click_proc
+      ->sell_click
     end
 
     def trades_position

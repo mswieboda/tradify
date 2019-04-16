@@ -1,22 +1,70 @@
 module Tradify
-  class Level3 < Level
+  class Level3 < Level2
     INITIAL_BALANCE = 500
-    TARGET_PROFIT   = 100
+    TARGET_PROFIT   = 300
     PRICE_DATA      = [70, 80, 50, 50, 80, 90, 80, 40, 20, 90, 90, 90, 90, 80, 10]
 
-    def load
-      @account = Account.new(balance: INITIAL_BALANCE)
-      @screen = Screen.new(
-        game: @game,
-        account: @account,
-        price_data: PRICE_DATA,
-        level: self
-      )
+    def load(balance = INITIAL_BALANCE)
+      super
+
+      sell_button.enable
     end
 
     def start
       # ran once the level is loaded, and first update and draw ran
       @game.show(TypedMessage.new("Now you can short!")) unless Game::DEBUG
+    end
+
+    def buy_click_proc
+      ->buy_click_level_3
+    end
+
+    def sell_click_proc
+      ->sell_click_level_3
+    end
+
+    def buy_click_level_3
+      price = screen.price
+
+      @account.execute_trade(Trade.new(action: Action::Buy, price: price))
+
+      if @account.open_trades?
+        buy_button.disable
+      end
+
+      sell_button.enable
+
+      if @account.open_buy_trades?
+        sell_button.text = "Sell"
+      else
+        sell_button.text = "Short"
+      end
+
+      true
+    end
+
+    def sell_click_level_3
+      price = screen.price
+
+      if sell_button.text == "Sell"
+        @account.execute_trade(Trade.new(action: Action::Sell, price: price))
+      else
+        @account.execute_trade(Trade.new(action: Action::Short, price: price))
+      end
+
+      if @account.open_trades?
+        sell_button.disable
+      end
+
+      buy_button.enable
+
+      if @account.open_buy_trades?
+        sell_button.text = "Sell"
+      else
+        sell_button.text = "Short"
+      end
+
+      true
     end
 
     def target_reached?
