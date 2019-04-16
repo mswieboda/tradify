@@ -31,6 +31,9 @@ module Tradify
     end
 
     def draw(px, py)
+      super
+      return if hidden?
+
       LibRay.draw_text_ex(
         sprite_font: LibRay.get_default_font,
         text: @text,

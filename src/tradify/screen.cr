@@ -71,6 +71,7 @@ module Tradify
 
     def draw(px, py)
       super(@side_panel_x, @side_panel_y)
+      return if hidden?
 
       @chart.draw
 

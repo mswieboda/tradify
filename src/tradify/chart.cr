@@ -60,7 +60,11 @@ module Tradify
       end
     end
 
-    def draw
+    def draw(px, py)
+      super
+      return if hidden?
+
+      # TODO: have these use px, py
       draw_background
       draw_grid
       draw_init_price_line

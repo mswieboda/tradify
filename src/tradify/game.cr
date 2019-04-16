@@ -9,7 +9,7 @@ module Tradify
 
     @game_over_text_color : LibRay::Color
 
-    SCREEN_WIDTH  = 1024
+    SCREEN_WIDTH  = 1280
     SCREEN_HEIGHT =  768
 
     DEBUG = true

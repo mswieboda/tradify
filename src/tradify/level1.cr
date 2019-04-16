@@ -9,15 +9,12 @@ module Tradify
 
       side_panel_components = [] of Component
 
-      # balance
-      @balance_label = Label.new(0, 0, text: "$#{@account.balance}")
-      side_panel_components << @balance_label.as(Component)
-
+      load_balance(side_panel_components)
       load_buttons(side_panel_components)
 
       # side panel
       side_panel = Component.new(
-        width: [150, side_panel_components.map(&.width).max + Screen::PADDING].max,
+        width: [192, side_panel_components.map(&.width).max + Screen::PADDING].max,
         components: side_panel_components
       )
 
@@ -38,6 +35,12 @@ module Tradify
         width: side_panel.width,
         height: side_panel.height - side_panel_components.map(&.width).sum - Screen::PADDING
       )
+    end
+
+    def load_balance(side_panel_components)
+      # balance
+      @balance_label = Label.new(0, 0, text: "$#{@account.balance}")
+      side_panel_components << @balance_label.as(Component)
     end
 
     def load_buttons(side_panel_components)
@@ -95,7 +98,7 @@ module Tradify
     def update
       super
 
-      update_balance
+      update_account
       update_buttons
     end
 
@@ -137,7 +140,7 @@ module Tradify
       end
     end
 
-    def update_balance
+    def update_account
       balance_label.text = "$#{@account.balance}"
     end
 

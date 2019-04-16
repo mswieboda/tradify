@@ -8,9 +8,39 @@ module Tradify
       super
     end
 
+    def load_balance(side_panel_components)
+      @balance_label = Label.new(0, 0, text: "$#{@account.balance}")
+      @positions_label = Label.new(balance_label.width + Screen::PADDING, 0, text: "-1 $")
+
+      side_panel_components << @positions_label.as(Component)
+      side_panel_components << @balance_label.as(Component)
+    end
+
     def start
       # ran once the level is loaded, and first update and draw ran
       @game.show(TypedMessage.new("Now you can have more than one lot!")) unless Game::DEBUG
+    end
+
+    def positions_label
+      @positions_label.as(Label)
+    end
+
+    def update_account
+      open_trades = @account.trades.select(&.open?)
+
+      if open_trades.any?
+        profit_and_loss = open_trades.sum(&.profit_and_loss(price))
+        indicator = open_trades.select(&.buy?).any? ? "+" : "-"
+
+        positions_label.text = "#{indicator}#{open_trades.size} $#{profit_and_loss}"
+        positions_label.show
+
+        balance_label.text = "$#{@account.balance + profit_and_loss}"
+      else
+        positions_label.hide
+
+        balance_label.text = "$#{@account.balance}"
+      end
     end
 
     def update_buttons

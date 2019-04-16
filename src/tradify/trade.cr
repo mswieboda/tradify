@@ -20,6 +20,14 @@ module Tradify
       @open = false
     end
 
+    def profit_and_loss(market_price)
+      if buy?
+        market_price - price
+      else
+        price - market_price
+      end
+    end
+
     def to_s(io : IO)
       text = "1 @ $#{price}"
       text = "-" + text if sell? || short?
