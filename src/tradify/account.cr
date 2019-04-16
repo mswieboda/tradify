@@ -17,7 +17,7 @@ module Tradify
           trade.close
 
           if first.short?
-            @balance += (first.price - trade.price) + first.price
+            @balance += (first.price - trade.price)
             return
           end
         end
@@ -31,8 +31,6 @@ module Tradify
           trade.close
         end
       elsif trade.short?
-        @balance -= trade.price
-
         if first_buy
           first_buy.as(Trade).close
           trade.close

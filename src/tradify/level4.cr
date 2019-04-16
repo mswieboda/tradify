@@ -13,40 +13,24 @@ module Tradify
       @game.show(TypedMessage.new("Now you can have more than one lot!")) unless Game::DEBUG
     end
 
-    def buy_click_proc
-      ->buy_click_level_4
-    end
+    def update_buttons
+      if price > @account.balance
+        buy_button.disable
 
-    def sell_click_proc
-      ->sell_click_level_4
-    end
-
-    def buy_click_level_4
-      buy(screen.price)
-
-      if @account.open_buy_trades?
-        sell_button.text = "Sell"
+        if @account.open_buy_trades?
+          sell_button.text = "Sell"
+        else
+          sell_button.text = "Short"
+        end
       else
-        sell_button.text = "Short"
+        buy_button.enable
+
+        if @account.open_buy_trades?
+          sell_button.text = "Sell"
+        else
+          sell_button.text = "Short"
+        end
       end
-
-      true
-    end
-
-    def sell_click_level_4
-      if sell_button.text == "Sell"
-        sell(screen.price)
-      else
-        short(screen.price)
-      end
-
-      if @account.open_buy_trades?
-        sell_button.text = "Sell"
-      else
-        sell_button.text = "Short"
-      end
-
-      true
     end
 
     def target_reached?

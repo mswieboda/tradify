@@ -15,30 +15,8 @@ module Tradify
       @game.show(TypedMessage.new("Now you can short!")) unless Game::DEBUG
     end
 
-    def buy_click_proc
-      ->buy_click_level_3
-    end
-
     def sell_click_proc
       ->sell_click_level_3
-    end
-
-    def buy_click_level_3
-      buy(screen.price)
-
-      if @account.open_trades?
-        buy_button.disable
-      end
-
-      sell_button.enable
-
-      if @account.open_buy_trades?
-        sell_button.text = "Sell"
-      else
-        sell_button.text = "Short"
-      end
-
-      true
     end
 
     def short(price)
@@ -52,19 +30,36 @@ module Tradify
         short(screen.price)
       end
 
-      if @account.open_trades?
-        sell_button.disable
-      end
-
-      buy_button.enable
-
-      if @account.open_buy_trades?
-        sell_button.text = "Sell"
-      else
-        sell_button.text = "Short"
-      end
-
       true
+    end
+
+    def update_buttons
+      if price > @account.balance
+        buy_button.disable
+
+        if @account.open_buy_trades?
+          sell_button.text = "Sell"
+          sell_button.enable
+        else
+          sell_button.text = "Short"
+          sell_button.enable
+        end
+      else
+        if @account.open_buy_trades?
+          buy_button.disable
+          sell_button.text = "Sell"
+          sell_button.enable
+        else
+          buy_button.enable
+          sell_button.text = "Short"
+
+          if @account.open_trades?
+            sell_button.disable
+          else
+            sell_button.enable
+          end
+        end
+      end
     end
 
     def target_reached?

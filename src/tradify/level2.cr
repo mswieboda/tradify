@@ -20,40 +20,28 @@ module Tradify
       @game.show(TypedMessage.new("Try to make money by buying and selling, with a different chart!")) unless Game::DEBUG
     end
 
-    def buy_click_proc
-      ->buy_click_level_2
-    end
+    def update_buttons
+      if price > @account.balance
+        buy_button.disable
 
-    def sell_click_proc
-      ->sell_click_level_2
-    end
-
-    def buy_click_level_2
-      buy(screen.price)
-
-      if @account.open_trades?
-        sell_button.text = "Sell"
-        sell_button.enable
+        if @account.open_trades?
+          sell_button.text = "Sell"
+          sell_button.enable
+        else
+          sell_button.text = "Short"
+          sell_button.disable
+        end
       else
-        sell_button.text = "Short"
-        sell_button.disable
+        if @account.open_trades?
+          buy_button.disable
+          sell_button.text = "Sell"
+          sell_button.enable
+        else
+          buy_button.enable
+          sell_button.text = "Short"
+          sell_button.disable
+        end
       end
-
-      true
-    end
-
-    def sell_click_level_2
-      sell(screen.price)
-
-      if @account.open_trades?
-        sell_button.text = "Sell"
-        sell_button.enable
-      else
-        sell_button.text = "Short"
-        sell_button.disable
-      end
-
-      true
     end
 
     def target_reached?

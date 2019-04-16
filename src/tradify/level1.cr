@@ -1,7 +1,7 @@
 module Tradify
   class Level1 < Level
-    INITIAL_BALANCE = 1000
-    TARGET_PROFIT   =  100
+    INITIAL_BALANCE = 500
+    TARGET_PROFIT   = 100
     PRICE_DATA      = [70, 50, 70, 90, 40, 20, 15, 30, 10, 20, 30, 40, 45, 30, 50, 70, 60, 80, 100, 130, 150, 190, 140, 130, 110, 100, 90, 110, 130, 120, 150, 140, 160, 100, 90, 110, 90, 70, 50, 60, 50, 40, 50, 70, 60]
 
     def load(balance = INITIAL_BALANCE)
@@ -95,7 +95,8 @@ module Tradify
     def update
       super
 
-      balance_label.text = "$#{@account.balance}"
+      update_balance
+      update_buttons
     end
 
     def buy(price)
@@ -107,21 +108,37 @@ module Tradify
     end
 
     def buy_click
-      buy(screen.price)
-
-      buy_button.disable
-      sell_button.enable
-
+      buy(price)
       true
     end
 
     def sell_click
-      sell(screen.price)
-
-      buy_button.enable
-      sell_button.disable
-
+      sell(price)
       true
+    end
+
+    def update_buttons
+      if price > @account.balance
+        buy_button.disable
+
+        if @account.open_trades?
+          sell_button.enable
+        else
+          sell_button.disable
+        end
+      else
+        if @account.open_trades?
+          buy_button.disable
+          sell_button.enable
+        else
+          buy_button.enable
+          sell_button.disable
+        end
+      end
+    end
+
+    def update_balance
+      balance_label.text = "$#{@account.balance}"
     end
 
     def target_reached?

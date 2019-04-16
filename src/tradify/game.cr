@@ -48,7 +48,7 @@ module Tradify
       @levels = [] of Level
       @level_index = 0
 
-      [Level4, Level3, Level2, Level1].each do |level_class|
+      [Level4, Level4, Level3, Level2, Level1].each do |level_class|
         @levels << level_class.new(self).as(Level)
       end
 

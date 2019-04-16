@@ -15,7 +15,7 @@ module Tradify
 
     DEFAULT_COLOR  = LibRay::WHITE
     DISABLED_COLOR = LibRay::Color.new(r: 70, g: 70, b: 70, a: 255)
-    HOVER_COLOR    = LibRay::GREEN
+    HOVERED_COLOR  = LibRay::GREEN
 
     def initialize(@game : Game, x, y, @text : String, @click : Proc(Bool) = ->{ false }, @padding = PADDING)
       @measure = LibRay.measure_text_ex(
@@ -31,20 +31,35 @@ module Tradify
 
       @color = DEFAULT_COLOR
       @disabled = false
+      @hovered = false
     end
 
     def disable
       @disabled = true
-      @color = DISABLED_COLOR
     end
 
     def enable
       @disabled = false
-      @color = DEFAULT_COLOR
     end
 
     def enabled?
       !disabled?
+    end
+
+    def hovered?
+      @hovered
+    end
+
+    def color
+      if disabled?
+        DISABLED_COLOR
+      else
+        if hovered?
+          HOVERED_COLOR
+        else
+          DEFAULT_COLOR
+        end
+      end
     end
 
     def remeasure
@@ -64,11 +79,11 @@ module Tradify
       mouse = LibRay.get_mouse_position
 
       if over?(px, py, mouse)
-        @color = HOVER_COLOR
+        @hovered = true
 
         click if LibRay.mouse_button_pressed?(LibRay::MOUSE_LEFT_BUTTON)
       else
-        @color = DEFAULT_COLOR
+        @hovered = false
       end
     end
 
@@ -90,7 +105,7 @@ module Tradify
         ),
         font_size: FONT_SIZE,
         spacing: SPACING,
-        color: @color
+        color: color
       )
 
       LibRay.draw_rectangle_lines(
@@ -98,7 +113,7 @@ module Tradify
         pos_y: py + @y,
         width: @width,
         height: @height,
-        color: @color
+        color: color
       )
     end
   end

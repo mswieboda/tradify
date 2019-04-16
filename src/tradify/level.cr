@@ -1,7 +1,8 @@
 module Tradify
-  class Level
+  abstract class Level
     getter? loaded
     getter? completed
+    delegate price, to: screen
 
     @screen : Screen | Nil
 
@@ -32,10 +33,6 @@ module Tradify
       # ran once the level is loaded, and first update and draw ran
     end
 
-    def number
-      self.class.name.sub(Level.name, "").to_i
-    end
-
     def draw
       screen.draw
     end
@@ -48,16 +45,11 @@ module Tradify
         @completed = true
       end
 
-      update_level
-
       return if loaded?
 
       start
 
       @loaded = true
-    end
-
-    def update_level
     end
 
     def target_reached?
