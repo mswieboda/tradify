@@ -98,10 +98,16 @@ module Tradify
       balance_label.text = "$#{@account.balance}"
     end
 
-    def buy_click
-      price = screen.price
-
+    def buy(price)
       @account.execute_trade(Trade.new(action: Action::Buy, price: price))
+    end
+
+    def sell(price)
+      @account.execute_trade(Trade.new(action: Action::Sell, price: price))
+    end
+
+    def buy_click
+      buy(screen.price)
 
       buy_button.disable
       sell_button.enable
@@ -110,9 +116,7 @@ module Tradify
     end
 
     def sell_click
-      price = screen.price
-
-      @account.execute_trade(Trade.new(action: Action::Sell, price: price))
+      sell(screen.price)
 
       buy_button.enable
       sell_button.disable

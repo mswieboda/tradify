@@ -24,9 +24,7 @@ module Tradify
     end
 
     def buy_click_level_3
-      price = screen.price
-
-      @account.execute_trade(Trade.new(action: Action::Buy, price: price))
+      buy(screen.price)
 
       if @account.open_trades?
         buy_button.disable
@@ -43,13 +41,15 @@ module Tradify
       true
     end
 
-    def sell_click_level_3
-      price = screen.price
+    def short(price)
+      @account.execute_trade(Trade.new(action: Action::Short, price: price))
+    end
 
+    def sell_click_level_3
       if sell_button.text == "Sell"
-        @account.execute_trade(Trade.new(action: Action::Sell, price: price))
+        sell(screen.price)
       else
-        @account.execute_trade(Trade.new(action: Action::Short, price: price))
+        short(screen.price)
       end
 
       if @account.open_trades?
