@@ -12,7 +12,7 @@ module Tradify
     SCREEN_WIDTH  = 1280
     SCREEN_HEIGHT =  768
 
-    DEBUG = true
+    DEBUG = false
 
     TARGET_FPS = 60
     DRAW_FPS   = DEBUG
@@ -48,7 +48,7 @@ module Tradify
       @levels = [] of Level
       @level_index = 0
 
-      [Level4, Level4, Level3, Level2, Level1].each do |level_class|
+      [Level1, Level2, Level3, Level4].each do |level_class|
         @levels << level_class.new(self).as(Level)
       end
 
@@ -107,7 +107,7 @@ module Tradify
 
       unpause if @message.just_closed?
 
-      change_level if level.completed?
+      change_level if level.completed? || LibRay.key_pressed?(LibRay::KEY_ONE)
 
       if check_game_over?
         @game_over_timer.increase(LibRay.get_frame_time)
